@@ -4,3 +4,6 @@ spring:
   jpa:
     generate-ddl: false
     show-sql: true
+user:
+  cards:
+    limit: 5

@@ -32,7 +32,7 @@ public class User extends BaseEntity{
     private String email;
 
     @Column(nullable = false)
-    private Boolean active;
+    private Boolean active = true;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<PaymentCard> cards;
