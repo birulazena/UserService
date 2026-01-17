@@ -12,8 +12,9 @@ import com.github.birulazena.UserService.mapper.PaymentCardMapper;
 import com.github.birulazena.UserService.repository.PaymentCardRepository;
 import com.github.birulazena.UserService.repository.UserRepository;
 import com.github.birulazena.UserService.specification.PaymentCardSpecification;
-import com.github.birulazena.UserService.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,9 +35,12 @@ public class PaymentCardService {
 
     private final UserRepository userRepository;
 
+    private final CacheManager cacheManager;
+
     @Value("${user.cards.limit}")
     private int cardLimit;
 
+    @CacheEvict(value = "user_cache", key = "#userId")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public PaymentCardResponseDto createPaymentCardForUser(Long userId, PaymentCardRequestDto paymentCardRequestDto) {
         User user = userRepository.findById(userId)
@@ -78,6 +82,7 @@ public class PaymentCardService {
         paymentCard.setUser(oldPaymentCard.getUser());
         paymentCard.setId(id);
         PaymentCard savePaymentCard = paymentCardRepository.save(paymentCard);
+        cacheManager.getCache("user_cache").evict(oldPaymentCard.getUser().getId());
         return paymentCardMapper.toDto(savePaymentCard);
     }
 
@@ -88,6 +93,8 @@ public class PaymentCardService {
         if(paymentCard.getActive().equals(Boolean.TRUE))
             return;
         paymentCardRepository.updateActive(id, true);
+        cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
+        paymentCardRepository.updateActive(id, true);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -97,13 +104,16 @@ public class PaymentCardService {
         if(paymentCard.getActive().equals(Boolean.FALSE))
             return;
         paymentCardRepository.updateActive(id, false);
+        paymentCardRepository.updateActive(id, false);
+        cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteCardById(Long id) {
+        PaymentCard paymentCard = paymentCardRepository.findById(id)
+                .orElseThrow(() -> new PaymentCardNotFoundException("Payment card with id " + id + " not found"));
         paymentCardRepository.deleteById(id);
+        cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
     }
-
-
 
 }
