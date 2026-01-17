@@ -14,6 +14,8 @@ import com.github.birulazena.UserService.repository.UserRepository;
 import com.github.birulazena.UserService.specification.PaymentCardSpecification;
 import com.github.birulazena.UserService.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,6 +35,9 @@ public class PaymentCardService {
 
     private final UserRepository userRepository;
 
+    private final CacheManager cacheManager;
+
+    @CacheEvict(value = "user_cache", key = "#userId")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public PaymentCardResponseDto createPaymentCardForUser(Long userId, PaymentCardRequestDto paymentCardRequestDto) {
         User user = userRepository.findById(userId)
@@ -73,6 +78,7 @@ public class PaymentCardService {
         paymentCard.setUser(oldPaymentCard.getUser());
         paymentCard.setId(id);
         PaymentCard savePaymentCard = paymentCardRepository.save(paymentCard);
+        cacheManager.getCache("user_cache").evict(oldPaymentCard.getUser().getId());
         return paymentCardMapper.toDto(savePaymentCard);
     }
 
@@ -83,6 +89,7 @@ public class PaymentCardService {
         if(paymentCard.getActive().equals(Boolean.TRUE))
             return;
         paymentCardRepository.updateActivate(id, true);
+        cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -92,13 +99,15 @@ public class PaymentCardService {
         if(paymentCard.getActive().equals(Boolean.FALSE))
             return;
         paymentCardRepository.updateActivate(id, false);
+        cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteCardById(Long id) {
+        PaymentCard paymentCard = paymentCardRepository.findById(id)
+                .orElseThrow(() -> new PaymentCardNotFoundException("Payment card with id " + id + " not found"));
         paymentCardRepository.deleteById(id);
+        cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
     }
-
-
 
 }

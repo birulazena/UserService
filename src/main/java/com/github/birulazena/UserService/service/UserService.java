@@ -7,12 +7,14 @@ import com.github.birulazena.UserService.dto.response.UserResponseDto;
 import com.github.birulazena.UserService.entity.User;
 import com.github.birulazena.UserService.exception.PaymentCardLimitExceededException;
 import com.github.birulazena.UserService.exception.UserNotFoundException;
-import com.github.birulazena.UserService.mapper.PaymentCardMapper;
 import com.github.birulazena.UserService.mapper.UserMapper;
-import com.github.birulazena.UserService.repository.PaymentCardRepository;
 import com.github.birulazena.UserService.repository.UserRepository;
 import com.github.birulazena.UserService.specification.UserSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +30,9 @@ public class UserService {
 
     private final UserMapper userMapper;
 
+    private final CacheManager cacheManager;
+
+    @CachePut(value = "user_cache", key = "#result.id()")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = userMapper.toEntity(userRequestDto);
@@ -40,6 +45,7 @@ public class UserService {
         return userMapper.toDto(saveUser);
     }
 
+    @Cacheable(value = "user_cache", key = "#id")
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
@@ -62,9 +68,11 @@ public class UserService {
         user.setId(id);
         user.setActive(oldUser.getActive());
         User updateUser = userRepository.save(user);
+        cacheManager.getCache("user_cache").put(id, userMapper.toDto(updateUser));
         return userMapper.toOnlyUserResponseDto(updateUser);
     }
 
+    @CacheEvict(value = "user_cache", key = "#id")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void activateUserById(Long id) {
         User user = userRepository.findById(id)
@@ -75,7 +83,7 @@ public class UserService {
     }
 
 
-
+    @CacheEvict(value = "user_cache", key = "#id")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deactivateUserById(Long id) {
         User user = userRepository.findById(id)
@@ -85,6 +93,7 @@ public class UserService {
         userRepository.updateActive(id, false);
     }
 
+    @CacheEvict(value = "user_cache", key = "#id")
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
