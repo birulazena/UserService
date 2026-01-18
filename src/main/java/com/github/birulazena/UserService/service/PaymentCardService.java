@@ -71,6 +71,7 @@ public class PaymentCardService {
                 .toList();
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public PaymentCardResponseDto updateCardById(Long id, PaymentCardRequestDto paymentCardRequestDto) {
         PaymentCard oldPaymentCard = paymentCardRepository.findById(id)
                 .orElseThrow(() -> new PaymentCardNotFoundException("Payment card with id " + id + " not found"));
