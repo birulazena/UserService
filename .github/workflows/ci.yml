@@ -30,7 +30,7 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.organization=birulazena
+            -Dsonar.organization=777huvak
             -Dsonar.projectKey=birulazena_UserService
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
