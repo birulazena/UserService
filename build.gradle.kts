@@ -38,6 +38,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-liquibase-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("org.testcontainers:testcontainers-junit-jupiter:2.0.2")
+	testImplementation ("org.testcontainers:testcontainers-postgresql")
 	implementation ("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor ("org.mapstruct:mapstruct-processor:1.5.5.Final")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")

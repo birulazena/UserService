@@ -94,7 +94,6 @@ public class PaymentCardService {
             return;
         paymentCardRepository.updateActive(id, true);
         cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
-        paymentCardRepository.updateActive(id, true);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -103,7 +102,6 @@ public class PaymentCardService {
                 .orElseThrow(() -> new PaymentCardNotFoundException("Payment card with id " + id + " not found"));
         if(paymentCard.getActive().equals(Boolean.FALSE))
             return;
-        paymentCardRepository.updateActive(id, false);
         paymentCardRepository.updateActive(id, false);
         cacheManager.getCache("user_cache").evict(paymentCard.getUser().getId());
     }
