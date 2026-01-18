@@ -29,6 +29,9 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v5
         with:
           projectBaseDir: .
+          args: >
+            -Dsonar.organization=birulazena
+            -Dsonar.projectKey=birulazena_UserService
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL}}
