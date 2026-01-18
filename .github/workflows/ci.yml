@@ -26,7 +26,7 @@ jobs:
         run: ./gradlew test
 
       - name: Code Analysis
-        uses: SonarSource/sonarcloud-github-action@v5
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: .
           args: >
