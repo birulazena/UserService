@@ -2,6 +2,7 @@ package com.github.birulazena.UserService.handler;
 
 import com.github.birulazena.UserService.dto.response.error.ErrorResponse;
 import com.github.birulazena.UserService.dto.response.error.ValidationErrorResponse;
+import com.github.birulazena.UserService.exception.InvalidTokenException;
 import com.github.birulazena.UserService.exception.PaymentCardLimitExceededException;
 import com.github.birulazena.UserService.exception.PaymentCardNotFoundException;
 import com.github.birulazena.UserService.exception.UserNotFoundException;
@@ -43,5 +44,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> unexpectedErrorHandler(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("An unexpected error occurred. Please try again later"));
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> unauthorizedHandler(InvalidTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
     }
 }

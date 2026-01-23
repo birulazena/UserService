@@ -9,3 +9,7 @@ user:
     limit: 5
   cache:
     type: redis
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
