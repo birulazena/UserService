@@ -27,6 +27,7 @@ services:
       - DB_URL=${DB_URL_DOCKER}
       - DB_USERNAME=${DB_USERNAME_DOCKER}
       - DB_PASSWORD=${DB_PASSWORD_DOCKER}
+      - JWT_SECRET=${JWT_SECRET}
 
 volumes:
   user_db:
