@@ -1,0 +1,15 @@
+spring:
+  liquibase:
+    change-log: classpath:db/changelog-master.yml
+  jpa:
+    generate-ddl: false
+    show-sql: true
+user:
+  cards:
+    limit: 5
+  cache:
+    type: redis
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
