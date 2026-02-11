@@ -23,7 +23,7 @@ public class PaymentCardController {
 
     private final PaymentCardService paymentCardService;
 
-    @PreAuthorize("#id == authentication.details['userId'] or hasRole('ADMIN')")
+    @PreAuthorize("#userId == authentication.details['userId'] or hasRole('ADMIN')")
     @PostMapping("/{userId}")
     public ResponseEntity<PaymentCardResponseDto> createCard(@PathVariable Long userId,
                                                              @Valid @RequestBody PaymentCardRequestDto paymentCardRequestDto){
