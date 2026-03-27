@@ -1,6 +1,6 @@
 package com.github.birulazena.UserService.security.access;
 
-import com.github.birulazena.UserService.repository.UserRepository;
+import com.github.birulazena.UserService.repository.PaymentCardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -8,12 +8,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserSecurity {
 
-    private final UserRepository userRepository;
+    private final PaymentCardRepository paymentCardRepository;
 
     public boolean belongsToUser(Long userId, Long cardId) {
-        return userRepository.findById(userId)
-                .map(user -> user.getCards().stream()
-                        .anyMatch(card -> card.getId().equals(cardId)))
-                .orElse(false);
+
+        return paymentCardRepository.existsByIdAndUserId(cardId, userId);
     }
 }
