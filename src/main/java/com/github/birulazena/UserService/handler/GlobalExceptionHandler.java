@@ -2,10 +2,7 @@ package com.github.birulazena.UserService.handler;
 
 import com.github.birulazena.UserService.dto.response.error.ErrorResponse;
 import com.github.birulazena.UserService.dto.response.error.ValidationErrorResponse;
-import com.github.birulazena.UserService.exception.InvalidTokenException;
-import com.github.birulazena.UserService.exception.PaymentCardLimitExceededException;
-import com.github.birulazena.UserService.exception.PaymentCardNotFoundException;
-import com.github.birulazena.UserService.exception.UserNotFoundException;
+import com.github.birulazena.UserService.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +21,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
     }
 
-    @ExceptionHandler(PaymentCardLimitExceededException.class)
+    @ExceptionHandler({PaymentCardLimitExceededException.class, EmailAlreadyExistException.class})
     public ResponseEntity<ErrorResponse> PaymentCardLimitExceededHandler(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(ex.getMessage()));
     }
